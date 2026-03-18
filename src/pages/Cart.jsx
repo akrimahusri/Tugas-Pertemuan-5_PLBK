@@ -2,7 +2,7 @@
 import { useCart } from '../context/CartContext'; 
  
 export default function Cart() { 
-  const { items, totalPrice, removeItem, clearCart } = useCart(); 
+  const { items, totalPrice, removeItem, clearCart, updateItemQuantity } = useCart(); 
  
   if (items.length === 0) { 
     return ( 
@@ -28,6 +28,35 @@ export default function Cart() {
             <p style={{ margin: 0, color: '#666' }}> 
               ${item.price.toFixed(2)} x {item.quantity} 
             </p> 
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
+              <button
+                onClick={() => updateItemQuantity(item.id, -1)}
+                style={{
+                  width: '30px',
+                  height: '30px',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                  background: 'white',
+                  cursor: 'pointer',
+                }}
+              >
+                -
+              </button>
+              <span>{item.quantity}</span>
+              <button
+                onClick={() => updateItemQuantity(item.id, 1)}
+                style={{
+                  width: '30px',
+                  height: '30px',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                  background: 'white',
+                  cursor: 'pointer',
+                }}
+              >
+                +
+              </button>
+            </div>
           </div> 
           <p style={{ fontWeight: 'bold' }}> 
             ${(item.price * item.quantity).toFixed(2)} 

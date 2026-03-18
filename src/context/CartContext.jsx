@@ -48,6 +48,25 @@ function cartReducer(state, action) {
         ), 
       }; 
     } 
+
+    case 'UPDATE_ITEM_QUANTITY': {
+      const { productId, delta } = action.payload;
+      const newItems = state.items
+        .map((item) => {
+          if (item.id !== productId) return item;
+          return { ...item, quantity: item.quantity + delta };
+        })
+        .filter((item) => item.quantity > 0);
+
+      return {
+        items: newItems,
+        totalItems: newItems.reduce((sum, item) => sum + item.quantity, 0),
+        totalPrice: newItems.reduce(
+          (sum, item) => sum + item.price * item.quantity,
+          0
+        ),
+      };
+    }
  
     case 'CLEAR_CART': 
       return initialState; 
@@ -75,9 +94,18 @@ export function CartProvider({ children }) {
   const clearCart = () => { 
     dispatch({ type: 'CLEAR_CART' }); 
   }; 
+
+  const updateItemQuantity = (productId, delta) => {
+    dispatch({
+      type: 'UPDATE_ITEM_QUANTITY',
+      payload: { productId, delta },
+    });
+  };
  
   return ( 
-    <CartContext.Provider value={{ ...state, addItem, removeItem, clearCart }}> 
+    <CartContext.Provider
+      value={{ ...state, addItem, removeItem, clearCart, updateItemQuantity }}
+    > 
       {children} 
     </CartContext.Provider> 
   ); 

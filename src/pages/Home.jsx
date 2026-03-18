@@ -3,11 +3,13 @@ import { useState, useEffect } from 'react';
 import { getProducts, getCategories } from '../services/api'; 
 import ProductCard from '../components/ProductCard'; 
 import Loading from '../components/Loading'; 
+import SearchBar from '../components/SearchBar'; 
  
 export default function Home() { 
   const [products, setProducts] = useState([]); 
   const [categories, setCategories] = useState([]); 
   const [selectedCategory, setSelectedCategory] = useState('all'); 
+  const [searchTerm, setSearchTerm] = useState(''); 
   const [loading, setLoading] = useState(true); 
   const [error, setError] = useState(null); 
  
@@ -30,9 +32,15 @@ export default function Home() {
     fetchData(); 
   }, []); 
  
-  const filteredProducts = selectedCategory === 'all' 
-    ? products 
-    : products.filter((p) => p.category === selectedCategory); 
+  const filteredProducts = products.filter((product) => {
+    const matchesCategory =
+      selectedCategory === 'all' || product.category === selectedCategory;
+    const matchesSearch = product.title
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+
+    return matchesCategory && matchesSearch;
+  });
  
   if (loading) return <Loading />; 
   if (error) return <p style={{ color: 'red' }}>Error: {error}</p>; 
@@ -40,6 +48,8 @@ export default function Home() {
   return ( 
     <div style={{ padding: '2rem' }}> 
       <h2>Katalog Produk</h2> 
+
+      <SearchBar value={searchTerm} onChange={setSearchTerm} />
  
       {/* Filter Kategori */} 
       <div style={{ marginBottom: '1.5rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' 
@@ -78,9 +88,13 @@ export default function Home() {
         gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', 
         gap: '1.5rem', 
       }}> 
-        {filteredProducts.map((product) => ( 
-          <ProductCard key={product.id} product={product} /> 
-        ))} 
+        {filteredProducts.length > 0 ? (
+          filteredProducts.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))
+        ) : (
+          <p>Tidak ada produk yang cocok dengan pencarian Anda.</p>
+        )}
       </div> 
     </div> 
   ); 
